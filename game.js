@@ -53,43 +53,42 @@ var MAP = {
 var PREDATOR = {
 	
 	predArray: [],
-	SPEED: 120,
+	maxPreds: 1,
+	SPEED: 80,
+	moveTimer: 0,
 	
 	generate : function () {
 		var side = PS.random(4);
 		var pos;
 		var val = PS.random(16) - 1;
-		
+		if (PREDATOR.predArray.length < PREDATOR.maxPreds) {
 		if (side == 1) {
 			PS.color(val, MAP.HEIGHT-1, MAP.predator);
 			PS.radius(val, MAP.HEIGHT-1, 50);
-			//PS.debug("x: " + xValue + " y: " + yValue + "\n");
 			pos = { x_pos: val,
 					y_pos: MAP.HEIGHT-1 };
 		}
 		else if (side == 2) {
 			PS.color(MAP.WIDTH-1, val, MAP.predator);
 			PS.radius(MAP.WIDTH-1, val, 50);
-			//PS.debug("x: " + xValue + " y: " + yValue + "\n");
 			pos = { x_pos: MAP.WIDTH-1,
 					y_pos: val };
 		}
 		else if (side == 3) {
 			PS.color(val, 0, MAP.predator);
 			PS.radius(val, 0, 50);
-		//	PS.debug("x: " + xValue + " y: " + yValue + "\n");
 			pos = { x_pos: val,
 					y_pos: 0 };
 		}
 		else if (side == 4) {
 			PS.color(0, val, MAP.predator);
 			PS.radius(0, val, 50);
-			//PS.debug("x: " + xValue + " y: " + yValue + "\n");
 			pos = { x_pos: 0,
 					y_pos: val };
 		}
 		PREDATOR.predArray.push(pos);
-		MAP.myTimer = PS.timerStart(PREDATOR.SPEED, PREDATOR.predMove);
+		PREDATOR.moveTimer = PS.timerStart(PREDATOR.SPEED, PREDATOR.predMove);
+		}
 	},
 	
 	predMove : function() {
@@ -99,14 +98,12 @@ var PREDATOR = {
 		var newX;
 		var horizontal;
 		
-		//if (PREDATOR.predArray[0].y_pos > 7) {
 			xValue = PREDATOR.predArray[0].x_pos;
 			yValue = PREDATOR.predArray[0].y_pos;
 			PREDATOR.predArray = [];
 			
 			var xAbs = Math.abs(xValue - 7);
 			var yAbs = Math.abs(yValue - 7);
-			PS.debug("x: " + xValue + " y: " + yValue + "\n");
 			PS.color(xValue, yValue, PS.COLOR_WHITE);
 			PS.radius(xValue, yValue, 0);
 			
@@ -145,6 +142,7 @@ var PREDATOR = {
 			
 			var result = PS.unmakeRGB(PS.color(newX, newY), {});
 			if (result.r == 105 && result.g == 105 && result.b == 105) {
+				PS.timerStop(PREDATOR.moveTimer);
 				PS.timerStop(MAP.myTimer);
 				PS.statusText("Your young has died!");
 				MAP.gameOver = true;
@@ -154,10 +152,8 @@ var PREDATOR = {
 			
 			var pos = { x_pos: newX,
 					y_pos: newY };
-			PS.debug("x: " + newX + " y: " + newY + "\n");
 			PREDATOR.predArray.push(pos);
-			
-		//}
+
 	},
 };
 
@@ -170,11 +166,11 @@ PS.init = function( system, options ) {
 	// Otherwise you will get the default 8x8 grid
 
 	PS.gridSize( MAP.WIDTH, MAP.HEIGHT );
-	//PS.border(PS.ALL, PS.ALL, 0);
+	PS.border(PS.ALL, PS.ALL, 0);
 	PS.color(MAP.MID, MAP.MID, MAP.youngling);
 	PS.radius(MAP.MID, MAP.MID, 50);
 	PS.statusText("Protect Your Young!");
-
+	MAP.myTimer = PS.timerStart(60, PREDATOR.generate);
 
 	// Add any other initialization code you need here
 };
