@@ -155,6 +155,18 @@ var PREDATOR = {
 			PREDATOR.predArray.push(pos);
 
 	},
+	
+	kill : function () {
+		var xValue = PREDATOR.predArray[0].x_pos;
+		var yValue = PREDATOR.predArray[0].y_pos;
+		
+		PS.color(xValue, yValue, PS.COLOR_WHITE);
+		PS.radius(xValue, yValue, 0);
+		
+		PREDATOR.predArray = [];
+		PS.timerStop(PREDATOR.moveTimer);
+		PREDATOR.generate();
+	}
 };
 
 PS.init = function( system, options ) {
@@ -276,7 +288,7 @@ PS.keyDown = function( key, shift, ctrl, options ) {
 	// Add code here for when a key is pressed
 	if (!MAP.gameOver) {
 		if (key == 32) {
-			PREDATOR.generate();
+			PREDATOR.kill();
 		}
 	}
 };
