@@ -47,6 +47,7 @@ var MAP = {
 	myTimer: 0,
 	youngling: 0x696969,
 	predator: PS.COLOR_BLACK,
+	SCORE: 0,
 	
 };
 
@@ -144,7 +145,7 @@ var PREDATOR = {
 			if (result.r == 105 && result.g == 105 && result.b == 105) {
 				PS.timerStop(PREDATOR.moveTimer);
 				PS.timerStop(MAP.myTimer);
-				PS.statusText("Your young has died!");
+				PS.statusText("Your young has died! || SCORE: " + MAP.SCORE);
 				MAP.gameOver = true;
 			}
 			PS.color(newX, newY, MAP.predator);
@@ -165,6 +166,8 @@ var PREDATOR = {
 		
 		PREDATOR.predArray = [];
 		PS.timerStop(PREDATOR.moveTimer);
+		MAP.SCORE = MAP.SCORE + 1;
+		PS.statusText("Protect Your Young! || SCORE: " + MAP.SCORE);
 		PREDATOR.generate();
 	}
 };
@@ -181,7 +184,8 @@ PS.init = function( system, options ) {
 	PS.border(PS.ALL, PS.ALL, 0);
 	PS.color(MAP.MID, MAP.MID, MAP.youngling);
 	PS.radius(MAP.MID, MAP.MID, 50);
-	PS.statusText("Protect Your Young!");
+	MAP.SCORE = 0;
+	PS.statusText("Protect Your Young! || SCORE: " + MAP.SCORE);
 	MAP.myTimer = PS.timerStart(60, PREDATOR.generate);
 
 	// Add any other initialization code you need here
@@ -283,13 +287,16 @@ PS.keyDown = function( key, shift, ctrl, options ) {
 	"use strict";
 
 	// Uncomment the following line to inspect parameters
-	//	PS.debug( "DOWN: key = " + key + ", shift = " + shift + "\n" );
+	//PS.debug( "DOWN: key = " + key + ", shift = " + shift + "\n" );
 
 	// Add code here for when a key is pressed
 	if (!MAP.gameOver) {
 		if (key == 32) {
 			PREDATOR.kill();
 		}
+	}
+	if (key == 114) {
+		PS.init();
 	}
 };
 
