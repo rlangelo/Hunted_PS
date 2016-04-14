@@ -38,6 +38,54 @@ See dygraphs License.txt, <http://dygraphs.com> and <http://opensource.org/licen
 // [system] = an object containing engine and platform information; see documentation for details
 // [options] = an object with optional parameters; see documentation for details
 
+var MAP = {
+
+	WIDTH: 16,
+	HEIGHT: 16,
+	MID: 7,
+	myTimer: 0,
+	youngling: 0x696969,
+	predator: PS.COLOR_BLACK,
+	
+};
+
+var PREDATOR = {
+	
+	predArra: [],
+
+	generate : function () {
+		var side = PS.random(4);
+		var pos;
+		var val = PS.random(16) - 1;
+		
+		if (side == 1) {
+			PS.color(val, MAP.HEIGHT-1, MAP.predator);
+			PS.radius(val, MAP.HEIGHT-1, 50);
+			pos = { x_pos: val,
+					y_pos: MAP.HEIGHT };
+		}
+		else if (side == 2) {
+			PS.color(MAP.WIDTH-1, val, MAP.predator);
+			PS.radius(MAP.WIDTH-1, val, 50);
+			pos = { x_pos: MAP.WIDTH,
+					y_pos: val };
+		}
+		else if (side == 3) {
+			PS.color(val, 0, MAP.predator);
+			PS.radius(val, 0, 50);
+			pos = { x_pos: val,
+					y_pos: 0 };
+		}
+		else if (side == 4) {
+			PS.color(0, val, MAP.predator);
+			PS.radius(0, val, 50);
+			pos = { x_pos: 0,
+					y_pos: val };
+		}
+		PREDATOR.predArra.push(pos);
+	},
+};
+
 PS.init = function( system, options ) {
 	"use strict";
 
@@ -46,7 +94,11 @@ PS.init = function( system, options ) {
 	// Do this FIRST to avoid problems!
 	// Otherwise you will get the default 8x8 grid
 
-	PS.gridSize( 8, 8 );
+	PS.gridSize( MAP.WIDTH, MAP.HEIGHT );
+	PS.border(PS.ALL, PS.ALL, 0);
+	PS.color(MAP.MID, MAP.MID, MAP.youngling);
+	PS.radius(MAP.MID, MAP.MID, 50);
+
 
 	// Add any other initialization code you need here
 };
@@ -150,6 +202,10 @@ PS.keyDown = function( key, shift, ctrl, options ) {
 	//	PS.debug( "DOWN: key = " + key + ", shift = " + shift + "\n" );
 
 	// Add code here for when a key is pressed
+	if (key == 32) {
+		PREDATOR.generate();
+	}
+	
 };
 
 // PS.keyUp ( key, shift, ctrl, options )
