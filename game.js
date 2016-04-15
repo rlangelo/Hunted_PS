@@ -70,6 +70,10 @@ var PLAYER = {
 			PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
 			PLAYER.Y_POS = newY;
 		}
+		if (result.r == 124 && result.g == 124 && result.b == 124) {
+			PREDATOR.kill();
+			PS.radius(PLAYER.X_POS, newY, 0);
+		}
 	},
 
 	moveHorizontally: function(direction) {
@@ -85,6 +89,10 @@ var PLAYER = {
 			PS.color(newX, PLAYER.Y_POS, 0xd2d2d2)
 			PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
 			PLAYER.X_POS = newX;
+		}
+		if (result.r == 124 && result.g == 124 && result.b == 124) {
+			PREDATOR.kill();
+			PS.radius(newX, PLAYER.Y_POS, 0);
 		}
 	}
 
