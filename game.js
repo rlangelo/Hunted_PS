@@ -45,10 +45,49 @@ var MAP = {
 	gameOver: false,
 	MID: 7,
 	myTimer: 0,
-	youngling: 0x696969,
-	predator: PS.COLOR_BLACK,
+	youngling: 0xffffff,
+	predator: 0x7c7c7c,
 	SCORE: 0,
+	player: 0xd2d2d2,
 	
+};
+
+var PLAYER = {
+	X_POS: 8,
+	Y_POS: 7,
+
+	moveVertically: function(direction) {
+		var newY;
+		if (direction == 1) {
+			newY = PLAYER.Y_POS - 1;
+		}
+		else {
+			newY = PLAYER.Y_POS + 1;
+		}
+		var result = PS.unmakeRGB(PS.color(PLAYER.X_POS, newY), {});
+		if (result.r != 255 && result.g != 255 && result.b != 255) {
+			PS.color(PLAYER.X_POS, newY, 0xd2d2d2)
+			PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
+			PLAYER.Y_POS = newY;
+		}
+	},
+
+	moveHorizontally: function(direction) {
+		var newX;
+		if (direction == 1) {
+			newX = PLAYER.X_POS - 1;
+		}
+		else {
+			newX = PLAYER.X_POS + 1;
+		}
+		var result = PS.unmakeRGB(PS.color(newX, PLAYER.Y_POS), {});
+		if (result.r != 255 && result.g != 255 && result.b != 255) {
+			PS.color(newX, PLAYER.Y_POS, 0xd2d2d2)
+			PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
+			PLAYER.X_POS = newX;
+		}
+	}
+
 };
 
 var PREDATOR = {
@@ -105,7 +144,7 @@ var PREDATOR = {
 			
 			var xAbs = Math.abs(xValue - 7);
 			var yAbs = Math.abs(yValue - 7);
-			PS.color(xValue, yValue, PS.COLOR_WHITE);
+			PS.color(xValue, yValue, PS.COLOR_BLACK);
 			PS.radius(xValue, yValue, 0);
 			
 			if (xValue > 7 && yValue > 7) {
@@ -142,7 +181,8 @@ var PREDATOR = {
 			}
 			
 			var result = PS.unmakeRGB(PS.color(newX, newY), {});
-			if (result.r == 105 && result.g == 105 && result.b == 105) {
+
+			if (result.r == 255 && result.g == 255 && result.b == 255) {
 				PS.timerStop(PREDATOR.moveTimer);
 				PS.timerStop(MAP.myTimer);
 				PS.statusText("Your young has died! || SCORE: " + MAP.SCORE);
@@ -150,20 +190,22 @@ var PREDATOR = {
 			}
 			PS.color(newX, newY, MAP.predator);
 			PS.radius(newX, newY, 50);
-			
+
 			var pos = { x_pos: newX,
-					y_pos: newY };
+				y_pos: newY };
 			PREDATOR.predArray.push(pos);
+			if(result.r == 210 && result.g == 210 && result.b == 210){
+				PREDATOR.kill();
+				PS.radius(newX, newY, 0);
+				PS.color(newX, newY, 0xd2d2d2)
+			}
+
+
 
 	},
 	
 	kill : function () {
-		var xValue = PREDATOR.predArray[0].x_pos;
-		var yValue = PREDATOR.predArray[0].y_pos;
-		
-		PS.color(xValue, yValue, PS.COLOR_WHITE);
-		PS.radius(xValue, yValue, 0);
-		
+
 		PREDATOR.predArray = [];
 		PS.timerStop(PREDATOR.moveTimer);
 		MAP.SCORE = MAP.SCORE + 1;
@@ -180,12 +222,17 @@ PS.init = function( system, options ) {
 	// Do this FIRST to avoid problems!
 	// Otherwise you will get the default 8x8 grid
 
+	PS.statusColor(PS.COLOR_WHITE);
 	PS.gridSize( MAP.WIDTH, MAP.HEIGHT );
 	PS.border(PS.ALL, PS.ALL, 0);
+	PS.gridColor(PS.COLOR_BLACK);
+	PS.color(PS.ALL, PS.ALL, PS.COLOR_BLACK);
 	PS.color(MAP.MID, MAP.MID, MAP.youngling);
 	PS.radius(MAP.MID, MAP.MID, 50);
-	MAP.SCORE = 0;
+	PS.statusColor(PS.COLOR_WHITE);
+	PS.color(PLAYER.X_POS, PLAYER.Y_POS, MAP.player);
 	PS.statusText("Protect Your Young! || SCORE: " + MAP.SCORE);
+	PS.gridShadow(true, PS.COLOR_WHITE);
 	MAP.myTimer = PS.timerStart(60, PREDATOR.generate);
 
 	// Add any other initialization code you need here
@@ -290,13 +337,29 @@ PS.keyDown = function( key, shift, ctrl, options ) {
 	//PS.debug( "DOWN: key = " + key + ", shift = " + shift + "\n" );
 
 	// Add code here for when a key is pressed
-	if (!MAP.gameOver) {
-		if (key == 32) {
-			PREDATOR.kill();
-		}
-	}
-	if (key == 114) {
-		PS.init();
+	switch(key) {
+		case 1005:
+			PLAYER.moveHorizontally(1);
+			break;
+		case 1006:
+			PLAYER.moveVertically(1);
+			break;
+		case 1007:
+			PLAYER.moveHorizontally(2);
+			break;
+		case 1008:
+			PLAYER.moveVertically(2);
+			break;
+		case 32:
+			if (!MAP.gameOver) {
+				PREDATOR.kill();
+			}
+			break;
+		case 114:
+			PS.init();
+			break;
+		default:
+			break;
 	}
 };
 
