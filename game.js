@@ -104,6 +104,7 @@ var PREDATOR = {
 	maxPreds: 1,
 	SPEED: 80,
 	moveTimer: 0,
+	predPath:[],
 	
 	generate : function () {
 		var side = PS.random(4);
@@ -135,6 +136,7 @@ var PREDATOR = {
 					y_pos: val };
 		}
 		PREDATOR.predArray.push(pos);
+		PREDATOR.generatePath();
 		PREDATOR.moveTimer = PS.timerStart(PREDATOR.SPEED, PREDATOR.predMove);
 		}
 	},
@@ -154,40 +156,11 @@ var PREDATOR = {
 			var yAbs = Math.abs(yValue - 7);
 			PS.color(xValue, yValue, PS.COLOR_BLACK);
 			PS.radius(xValue, yValue, 0);
-			
-			if (xValue > 7 && yValue > 7) {
-				newX = xValue -1;
-				newY = yValue -1;
-			}
-			else if (xValue > 7 && yValue < 7) {
-				newX = xValue -1;
-				newY = yValue +1;
-			}
-			else if (xValue < 7 && yValue < 7) {
-				newX = xValue +1;
-				newY = yValue +1;
-			}
-			else if (xValue < 7 && yValue > 7) {
-				newX = xValue +1;
-				newY = yValue -1;
-			}
-			else if (xValue == 7 && yValue < 7) {
-				newX = xValue;
-				newY = yValue +1;
-			}
-			else if (xValue == 7 && yValue > 7) {
-				newX = xValue;
-				newY = yValue-1;
-			}
-			else if (xValue < 7 && yValue == 7) {
-				newX = xValue +1;
-				newY = yValue;
-			}
-			else if (xValue > 7 && yValue == 7) {
-				newX = xValue-1;
-				newY = yValue;
-			}
-			
+
+			var nextBead = PREDATOR.predPath.splice(0,1);
+			newX = nextBead[0];
+			newY = nextBead[1];
+
 			var result = PS.unmakeRGB(PS.color(newX, newY), {});
 
 			if (result.r == 255 && result.g == 255 && result.b == 255) {
@@ -202,14 +175,17 @@ var PREDATOR = {
 			var pos = { x_pos: newX,
 				y_pos: newY };
 			PREDATOR.predArray.push(pos);
-			if(result.r == 210 && result.g == 210 && result.b == 210){
-				PREDATOR.kill();
-				PS.radius(newX, newY, 0);
-				PS.color(newX, newY, 0xd2d2d2)
+
+			for(i = 0; i < PREDATOR.predPath.length; i++)
+			{
+				var coordinate = PREDATOR.predPath[i];
+				var result = PS.unmakeRGB(PS.color(coordinate[0], coordinate[1]), {});
+				if(result.r == 210 && result.g == 210 && result.b == 210){
+					PREDATOR.kill();
+					PS.radius(xValue, yValue, 0);
+					PS.color(xValue, yValue, PS.COLOR_WHITE);
+				}
 			}
-
-
-
 	},
 	
 	kill : function () {
@@ -219,6 +195,79 @@ var PREDATOR = {
 		MAP.SCORE = MAP.SCORE + 1;
 		PS.statusText("Protect Your Young! || SCORE: " + MAP.SCORE);
 		PREDATOR.generate();
+	},
+
+	generatePath : function() {
+		var xValue;
+		var yValue;
+		var newX;
+		var newY;
+		var coordinate = [];
+
+		xValue = PREDATOR.predArray[0].x_pos;
+		yValue = PREDATOR.predArray[0].y_pos;
+
+		newX = xValue;
+		newY = yValue;
+		while(newX != 7 && newY != 7)
+		{
+			if (xValue > 7 && yValue > 7) {
+				newX = newX-1;
+				newY = newY-1;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+			else if (xValue > 7 && yValue < 7) {
+				newX = newX-1;
+				newY = newY+1;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+			else if (xValue < 7 && yValue < 7) {
+				newX = newX+1;
+				newY = newY+1;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+			else if (xValue < 7 && yValue > 7) {
+				newX = newX+1;
+				newY = newY-1;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+			else if (xValue == 7 && yValue < 7) {
+				newX = newX;
+				newY = newY+1;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+			else if (xValue == 7 && yValue > 7) {
+				newX = newX;
+				newY = newY-1;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+			else if (xValue < 7 && yValue == 7) {
+				newX = newX+1;
+				newY = newY;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+			else if (xValue > 7 && yValue == 7) {
+				newX = newX-1;
+				newY = newY;
+				coordinate.push(newX);
+				coordinate.push(newY);
+				PREDATOR.predPath.push(coordinate);
+			}
+		}
 	}
 };
 
