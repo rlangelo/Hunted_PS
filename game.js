@@ -135,7 +135,47 @@ var PREDATOR = {
 					y_pos: val };
 		}
 		PREDATOR.predArray.push(pos);
+		PREDATOR.updateSpeed();
 		PREDATOR.moveTimer = PS.timerStart(PREDATOR.SPEED, PREDATOR.predMove);
+		}
+	},
+	
+	updateSpeed : function() {
+		if (MAP.SCORE == 5)
+		{
+			PREDATOR.SPEED = 60;
+		}
+		else if (MAP.SCORE == 10)
+		{
+			PREDATOR.SPEED = 50;
+		}
+		else if (MAP.SCORE == 15)
+		{
+			PREDATOR.SPEED = 40;
+		}
+		else if (MAP.SCORE == 20)
+		{
+			PREDATOR.SPEED = 35;
+		}
+		else if (MAP.SCORE == 25)
+		{
+			PREDATOR.SPEED = 30;
+		}
+		else if (MAP.SCORE == 30)
+		{
+			PREDATOR.SPEED = 25;
+		}
+		else if (MAP.SCORE == 35)
+		{
+			PREDATOR.SPEED = 20;
+		}
+		else if (MAP.SCORE == 40)
+		{
+			PREDATOR.SPEED = 15;
+		}
+		else if (MAP.SCORE == 50)
+		{
+			PREDATOR.SPPED = 10;
 		}
 	},
 	
