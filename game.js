@@ -46,10 +46,12 @@ var MAP = {
 	MID: 7,
 	myTimer: 0,
 	youngling: 0xffffff,
+	youngCounter: 1,
 	predator: 0x7c7c7c,
 	SCORE: 0,
 	player: 0xd2d2d2,
 	diffCounter: 0,
+	predSide: 0,
 	
 };
 
@@ -121,24 +123,28 @@ var PREDATOR = {
 		var val = PS.random(16) - 1;
 		if (PREDATOR.predArray.length < PREDATOR.maxPreds) {
 		if (side == 1) {
+			MAP.predSide = 1;
 			PS.color(val, MAP.HEIGHT-1, MAP.predator);
 			PS.radius(val, MAP.HEIGHT-1, 50);
 			pos = { x_pos: val,
 					y_pos: MAP.HEIGHT-1 };
 		}
 		else if (side == 2) {
+			MAP.predSide = 2;
 			PS.color(MAP.WIDTH-1, val, MAP.predator);
 			PS.radius(MAP.WIDTH-1, val, 50);
 			pos = { x_pos: MAP.WIDTH-1,
 					y_pos: val };
 		}
 		else if (side == 3) {
+			MAP.predSide = 3;
 			PS.color(val, 0, MAP.predator);
 			PS.radius(val, 0, 50);
 			pos = { x_pos: val,
 					y_pos: 0 };
 		}
 		else if (side == 4) {
+			MAP.predSide = 4;
 			PS.color(0, val, MAP.predator);
 			PS.radius(0, val, 50);
 			pos = { x_pos: 0,
@@ -151,13 +157,13 @@ var PREDATOR = {
 	},
 	
 	increaseDiff : function() {
-		if (MAP.SCORE == 5)
-		{
-			PREDATOR.SPEED = 60;
-		}
-		else if (MAP.SCORE == 10)
+		if (MAP.SCORE == 3)
 		{
 			PREDATOR.SPEED = 50;
+		}
+		else if (MAP.SCORE == 7)
+		{
+			PREDATOR.SPEED = 45;
 		}
 		else if (MAP.SCORE == 15)
 		{
@@ -167,6 +173,7 @@ var PREDATOR = {
 		{
 			PS.color(7, 5, MAP.youngling);
 			PS.radius(7, 5, 50);
+			MAP.youngCounter += 1;
 		}
 		else if (MAP.SCORE == 25)
 		{
@@ -180,6 +187,7 @@ var PREDATOR = {
 		{
 			PS.color(7, 9, MAP.youngling);
 			PS.radius(7,9, 50);
+			MAP.youngCounter += 1;
 		}
 		else if (MAP.SCORE == 40)
 		{
@@ -200,15 +208,13 @@ var PREDATOR = {
 			{
 				PS.color(5, 7, MAP.youngling);
 				PS.radius(5, 7, 50);
+				MAP.youngCounter += 1;
 			}
 			else if (MAP.diffCounter == 20)
 			{
 				PS.color(9, 7, MAP.youngling);
 				PS.radius(9, 7, 50);
-			}
-			else if (MAP.diffCounter == 30)
-			{
-				PREDATOR.SPEED = 5;
+				MAP.youngCounter += 1;
 			}
 		}
 		
@@ -220,49 +226,67 @@ var PREDATOR = {
 		var newY;
 		var newX;
 		var horizontal;
+		var targetX = 7;
+		var targetY = 7;
 		
 			xValue = PREDATOR.predArray[0].x_pos;
 			yValue = PREDATOR.predArray[0].y_pos;
 			PREDATOR.predArray = [];
 			
-			var xAbs = Math.abs(xValue - 7);
-			var yAbs = Math.abs(yValue - 7);
+			if (MAP.predSide == 1 && MAP.youngCounter == 3)
+			{
+				targetY = 9;
+			}
+			else if (MAP.predSide == 2 && MAP.youngCounter == 5)
+			{
+				targetX = 9;
+			}
+			else if (MAP.predSide == 3 && MAP.youngCounter == 2)
+			{
+				targetY = 5;
+			}
+			else if (MAP.predSide == 4 && MAP.youngCounter == 4)
+			{
+				targetX = 5;
+			}
+			
+			var xAbs = Math.abs(xValue - targetX);
+			var yAbs = Math.abs(yValue - targetY);
 			PS.color(xValue, yValue, PS.COLOR_BLACK);
 			PS.radius(xValue, yValue, 0);
 			
-			if (xValue > 7 && yValue > 7) {
+			if (xValue > targetX && yValue > targetY) {
 				newX = xValue -1;
 				newY = yValue -1;
 			}
-			else if (xValue > 7 && yValue < 7) {
+			else if (xValue > targetX && yValue < targetY) {
 				newX = xValue -1;
 				newY = yValue +1;
 			}
-			else if (xValue < 7 && yValue < 7) {
+			else if (xValue < targetX && yValue < targetY) {
 				newX = xValue +1;
 				newY = yValue +1;
 			}
-			else if (xValue < 7 && yValue > 7) {
+			else if (xValue < targetX && yValue > targetY) {
 				newX = xValue +1;
 				newY = yValue -1;
 			}
-			else if (xValue == 7 && yValue < 7) {
+			else if (xValue == targetX && yValue < targetY) {
 				newX = xValue;
 				newY = yValue +1;
 			}
-			else if (xValue == 7 && yValue > 7) {
+			else if (xValue == targetX && yValue > targetY) {
 				newX = xValue;
 				newY = yValue-1;
 			}
-			else if (xValue < 7 && yValue == 7) {
+			else if (xValue < targetX && yValue == targetY) {
 				newX = xValue +1;
 				newY = yValue;
 			}
-			else if (xValue > 7 && yValue == 7) {
+			else if (xValue > targetX && yValue == targetY) {
 				newX = xValue-1;
 				newY = yValue;
 			}
-			
 			var result = PS.unmakeRGB(PS.color(newX, newY), {});
 
 			if (result.r == 255 && result.g == 255 && result.b == 255) {
