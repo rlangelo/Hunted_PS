@@ -49,6 +49,7 @@ var MAP = {
 	predator: 0x7c7c7c,
 	SCORE: 0,
 	player: 0xd2d2d2,
+	diffCounter: 0,
 	
 };
 
@@ -57,45 +58,54 @@ var PLAYER = {
 	Y_POS: 7,
 
 	moveVertically: function(direction) {
-		var newY;
-		if (direction == 1) {
-			newY = PLAYER.Y_POS - 1;
-		}
-		else {
-			newY = PLAYER.Y_POS + 1;
-		}
-		var result = PS.unmakeRGB(PS.color(PLAYER.X_POS, newY), {});
-		if (result.r != 255 && result.g != 255 && result.b != 255) {
-			PS.color(PLAYER.X_POS, newY, 0xd2d2d2)
-			PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
-			PLAYER.Y_POS = newY;
-		}
-		if (result.r == 124 && result.g == 124 && result.b == 124) {
-			PREDATOR.kill();
-			PS.radius(PLAYER.X_POS, newY, 0);
+		if (!MAP.gameOver) {
+			var newY;
+			if (direction == 1) {
+				newY = PLAYER.Y_POS - 1;
+			}
+			else {
+				newY = PLAYER.Y_POS + 1;
+			}
+			if (newY != -1 && newY != 16)
+			{
+				var result = PS.unmakeRGB(PS.color(PLAYER.X_POS, newY), {});
+				if (result.r != 255 && result.g != 255 && result.b != 255) {
+					PS.color(PLAYER.X_POS, newY, 0xd2d2d2)
+					PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
+					PLAYER.Y_POS = newY;
+				}
+				if (result.r == 124 && result.g == 124 && result.b == 124) {
+					PREDATOR.kill();
+					PS.radius(PLAYER.X_POS, newY, 0);
+				}
+			}
 		}
 	},
 
 	moveHorizontally: function(direction) {
-		var newX;
-		if (direction == 1) {
-			newX = PLAYER.X_POS - 1;
-		}
-		else {
-			newX = PLAYER.X_POS + 1;
-		}
-		var result = PS.unmakeRGB(PS.color(newX, PLAYER.Y_POS), {});
-		if (result.r != 255 && result.g != 255 && result.b != 255) {
-			PS.color(newX, PLAYER.Y_POS, 0xd2d2d2)
-			PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
-			PLAYER.X_POS = newX;
-		}
-		if (result.r == 124 && result.g == 124 && result.b == 124) {
-			PREDATOR.kill();
-			PS.radius(newX, PLAYER.Y_POS, 0);
+		if (!MAP.gameOver) {
+			var newX;
+			if (direction == 1) {
+				newX = PLAYER.X_POS - 1;
+			}
+			else {
+				newX = PLAYER.X_POS + 1;
+			}
+			if (newX != -1 && newX != 16)
+			{
+				var result = PS.unmakeRGB(PS.color(newX, PLAYER.Y_POS), {});
+				if (result.r != 255 && result.g != 255 && result.b != 255) {
+					PS.color(newX, PLAYER.Y_POS, 0xd2d2d2)
+					PS.color(PLAYER.X_POS, PLAYER.Y_POS, PS.COLOR_BLACK);
+					PLAYER.X_POS = newX;
+				}
+				if (result.r == 124 && result.g == 124 && result.b == 124) {
+					PREDATOR.kill();
+					PS.radius(newX, PLAYER.Y_POS, 0);
+				}
+			}
 		}
 	}
-
 };
 
 var PREDATOR = {
@@ -135,12 +145,12 @@ var PREDATOR = {
 					y_pos: val };
 		}
 		PREDATOR.predArray.push(pos);
-		PREDATOR.updateSpeed();
+		PREDATOR.increaseDiff();
 		PREDATOR.moveTimer = PS.timerStart(PREDATOR.SPEED, PREDATOR.predMove);
 		}
 	},
 	
-	updateSpeed : function() {
+	increaseDiff : function() {
 		if (MAP.SCORE == 5)
 		{
 			PREDATOR.SPEED = 60;
@@ -155,28 +165,53 @@ var PREDATOR = {
 		}
 		else if (MAP.SCORE == 20)
 		{
-			PREDATOR.SPEED = 35;
+			PS.color(7, 5, MAP.youngling);
+			PS.radius(7, 5, 50);
 		}
 		else if (MAP.SCORE == 25)
 		{
-			PREDATOR.SPEED = 30;
+			PREDATOR.SPEED = 35;
 		}
 		else if (MAP.SCORE == 30)
 		{
-			PREDATOR.SPEED = 25;
+			PREDATOR.SPEED = 30;
 		}
 		else if (MAP.SCORE == 35)
 		{
-			PREDATOR.SPEED = 20;
+			PS.color(7, 9, MAP.youngling);
+			PS.radius(7,9, 50);
 		}
 		else if (MAP.SCORE == 40)
 		{
-			PREDATOR.SPEED = 15;
+			PREDATOR.SPEED = 20;
 		}
 		else if (MAP.SCORE == 50)
 		{
+			PREDATOR.SPEED = 15;
+		}
+		else if (MAP.SCORE == 55)
+		{
 			PREDATOR.SPPED = 10;
 		}
+		else if (MAP.SCORE > 54)
+		{
+			MAP.diffCounter += 1;
+			if (MAP.diffCounter == 10)
+			{
+				PS.color(5, 7, MAP.youngling);
+				PS.radius(5, 7, 50);
+			}
+			else if (MAP.diffCounter == 20)
+			{
+				PS.color(9, 7, MAP.youngling);
+				PS.radius(9, 7, 50);
+			}
+			else if (MAP.diffCounter == 30)
+			{
+				PREDATOR.SPEED = 5;
+			}
+		}
+		
 	},
 	
 	predMove : function() {
@@ -252,12 +287,21 @@ var PREDATOR = {
 
 	},
 	
+	rayTrace : function (initX, initY, srcX, srcY) {
+		
+	},
+	
 	kill : function () {
 
 		PREDATOR.predArray = [];
 		PS.timerStop(PREDATOR.moveTimer);
 		MAP.SCORE = MAP.SCORE + 1;
-		PS.statusText("Protect Your Young! || SCORE: " + MAP.SCORE);
+		if (MAP.SCORE < 10) {
+			PS.statusText("Protect Your Young! || SCORE: " + MAP.SCORE);
+		}
+		else {
+			PS.statusText("SCORE: " + MAP.SCORE);
+		}
 		PREDATOR.generate();
 	}
 };
