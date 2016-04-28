@@ -165,17 +165,17 @@ var PREDATOR = {
 		{
 			PREDATOR.SPEED = 45;
 		}
-		else if (MAP.SCORE == 15)
+		else if (MAP.SCORE == 12)
 		{
 			PREDATOR.SPEED = 40;
 		}
-		else if (MAP.SCORE == 20)
+		else if (MAP.SCORE == 18)
 		{
 			PS.color(7, 5, MAP.youngling);
 			PS.radius(7, 5, 50);
 			MAP.youngCounter += 1;
 		}
-		else if (MAP.SCORE == 25)
+		else if (MAP.SCORE == 24)
 		{
 			PREDATOR.SPEED = 35;
 		}
@@ -228,24 +228,35 @@ var PREDATOR = {
 		var horizontal;
 		var targetX = 7;
 		var targetY = 7;
+		var update = false;
+		var anUpdate = false;
 		
 			xValue = PREDATOR.predArray[0].x_pos;
 			yValue = PREDATOR.predArray[0].y_pos;
 			PREDATOR.predArray = [];
+			var change = PS.random(5);
+			if (change == 1 || change == 2)
+			{
+				update = true;
+			}
+			else if (change == 5)
+			{
+				anUpdate = true;
+			}
 			
-			if (MAP.predSide == 1 && MAP.youngCounter == 3)
+			if ((MAP.predSide == 1 && MAP.youngCounter == 3) || (update && MAP. youngCounter == 3))
 			{
 				targetY = 9;
 			}
-			else if (MAP.predSide == 2 && MAP.youngCounter == 5)
+			else if ((MAP.predSide == 2 && MAP.youngCounter == 5) || (update && MAP. youngCounter == 5))
 			{
 				targetX = 9;
 			}
-			else if (MAP.predSide == 3 && MAP.youngCounter == 2)
+			else if ((MAP.predSide == 3 && MAP.youngCounter == 2) || (update && MAP. youngCounter == 2) || (anUpdate && MAP.youngCounter == 2))
 			{
 				targetY = 5;
 			}
-			else if (MAP.predSide == 4 && MAP.youngCounter == 4)
+			else if ((MAP.predSide == 4 && MAP.youngCounter == 4) || (update && MAP. youngCounter == 4))
 			{
 				targetX = 5;
 			}
