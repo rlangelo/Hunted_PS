@@ -38,6 +38,9 @@ See dygraphs License.txt, <http://dygraphs.com> and <http://opensource.org/licen
 // [system] = an object containing engine and platform information; see documentation for details
 // [options] = an object with optional parameters; see documentation for details
 
+//Music used is from Maplestory.
+//Sounds are from bioacoustica
+
 var MAP = {
 
 	WIDTH: 16,
@@ -52,6 +55,7 @@ var MAP = {
 	player: 0xd2d2d2,
 	diffCounter: 0,
 	predSide: 0,
+	MUSIC: "wolf",
 	
 };
 
@@ -116,7 +120,9 @@ var PREDATOR = {
 	maxPreds: 1,
 	SPEED: 80,
 	moveTimer: 0,
-	
+	soundEffect: "chitter",
+	soundCounter: 0,
+
 	generate : function () {
 		var side = PS.random(4);
 		var pos;
@@ -263,6 +269,8 @@ var PREDATOR = {
 			
 			var xAbs = Math.abs(xValue - targetX);
 			var yAbs = Math.abs(yValue - targetY);
+			var totalDist = xAbs + yAbs;
+
 			PS.color(xValue, yValue, PS.COLOR_BLACK);
 			PS.radius(xValue, yValue, 0);
 			
@@ -316,6 +324,22 @@ var PREDATOR = {
 				PREDATOR.kill();
 				PS.radius(newX, newY, 0);
 				PS.color(newX, newY, 0xd2d2d2)
+			} else if(totalDist < 9)
+			{
+				if(PREDATOR.soundCounter == 0)
+				{
+					soundEffect = PS.audioPlay(PREDATOR.soundEffect,
+						{volume: 0.7,
+							path: "./",
+							fileTypes: ["mp3"]
+						})
+				}
+				PREDATOR.soundCounter += 1;
+				if(PREDATOR.soundCounter > 1)
+				{
+					PREDATOR.soundCounter = 0;
+				}
+
 			}
 
 
@@ -349,6 +373,13 @@ PS.init = function( system, options ) {
 	// Do this FIRST to avoid problems!
 	// Otherwise you will get the default 8x8 grid
 
+	PS.audioLoad(MAP.MUSIC,
+		{autoplay : true,
+			volume   : 0.2,
+			loop       : true,
+			lock       : true,
+			path       : "./",
+			fileTypes: ["mp3"]});
 	PS.statusColor(PS.COLOR_WHITE);
 	PS.gridSize( MAP.WIDTH, MAP.HEIGHT );
 	PS.border(PS.ALL, PS.ALL, 0);
