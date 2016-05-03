@@ -43,20 +43,38 @@ See dygraphs License.txt, <http://dygraphs.com> and <http://opensource.org/licen
 
 var MAP = {
 
-	WIDTH: 16,
-	HEIGHT: 16,
-	gameOver: false,
-	MID: 7,
-	myTimer: 0,
-	youngling: 0xffffff,
-	youngCounter: 1,
-	predator: 0x7c7c7c,
-	SCORE: 0,
-	player: 0xd2d2d2,
-	diffCounter: 0,
-	predSide: 0,
-	MUSIC: "wolf",
-	
+    WIDTH: 16,
+    HEIGHT: 16,
+    gameOver: false,
+    MID: 7,
+    myTimer: 0,
+    restartTimer: 0,
+    restartCounter: 5,
+    youngling: 0xffffff,
+    youngCounter: 1,
+    predator: 0x7c7c7c,
+    SCORE: 0,
+    player: 0xd2d2d2,
+    diffCounter: 0,
+    predSide: 0,
+    MUSIC: "wolf",
+
+    restart: function () {
+
+        if (MAP.restartCounter > 0) {
+            PS.statusText("Game restarting in..." + MAP.restartCounter);
+            MAP.restartCounter -= 1;
+        }
+        else {
+            /*PS.timerStop(MAP.restartTimer);
+            MAP.restartCounter = 5;
+            MAP.gameOver = false;
+            MAP.myTimer = PS.timerStart(60, PREDATOR.generate);
+            PS.init();*/
+            window.location.reload();
+        }
+    }
+
 };
 
 var PLAYER = {
@@ -120,7 +138,7 @@ var PREDATOR = {
 	maxPreds: 1,
 	SPEED: 80,
 	moveTimer: 0,
-	soundEffect: "chitter",
+	soundEffect: "predator",
 	soundCounter: 0,
 
 	generate : function () {
@@ -311,6 +329,7 @@ var PREDATOR = {
 			if (result.r == 255 && result.g == 255 && result.b == 255) {
 				PS.timerStop(PREDATOR.moveTimer);
 				PS.timerStop(MAP.myTimer);
+				MAP.restartTimer = PS.timerStart(60, MAP.restart);
 				PS.statusText("Your young has died! || SCORE: " + MAP.SCORE);
 				MAP.gameOver = true;
 			}
@@ -324,37 +343,24 @@ var PREDATOR = {
 				PREDATOR.kill();
 				PS.radius(newX, newY, 0);
 				PS.color(newX, newY, 0xd2d2d2)
-			} else if(totalDist < 9)
-			{
-				if(PREDATOR.soundCounter == 0)
-				{
-					soundEffect = PS.audioPlay(PREDATOR.soundEffect,
-						{volume: 0.7,
-							path: "./",
-							fileTypes: ["mp3"]
-						})
-				}
-				PREDATOR.soundCounter += 1;
-				if(PREDATOR.soundCounter > 1)
-				{
-					PREDATOR.soundCounter = 0;
-				}
-
 			}
-
 
 
 	},
 	
-	rayTrace : function (initX, initY, srcX, srcY) {
-		
-	},
 	
 	kill : function () {
 
 		PREDATOR.predArray = [];
 		PS.timerStop(PREDATOR.moveTimer);
 		MAP.SCORE = MAP.SCORE + 1;
+
+        soundEffect = PS.audioPlay(PREDATOR.soundEffect,
+						{volume: 0.2,
+							path: "./",
+							fileTypes: ["ogg"]
+						})
+
 		if (MAP.SCORE < 10) {
 			PS.statusText("Protect Your Young! || SCORE: " + MAP.SCORE);
 		}
@@ -375,7 +381,7 @@ PS.init = function( system, options ) {
 
 	PS.audioLoad(MAP.MUSIC,
 		{autoplay : true,
-			volume   : 0.2,
+			volume   : 0.4,
 			loop       : true,
 			lock       : true,
 			path       : "./",
@@ -507,14 +513,6 @@ PS.keyDown = function( key, shift, ctrl, options ) {
 			break;
 		case 1008:
 			PLAYER.moveVertically(2);
-			break;
-		case 32:
-			if (!MAP.gameOver) {
-				PREDATOR.kill();
-			}
-			break;
-		case 114:
-			PS.init();
 			break;
 		default:
 			break;
